@@ -1,0 +1,260 @@
+---
+title: "Assignment_1"
+author: "Balamanoj Reddy Kommareddy"
+date: "2023-09-22"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+***
+*This workbook contains the code for Assignment_1*
+
+# Summary:
+
+1. Maximum revenue = $1780. 
+
+2. To meet the above objective, Francesco Schröeder should manufacture 40 pounds of artisanal truffles, 12 pounds of 
+   handcrafted chocolate nuggets, and 4 pounds of premium gourmet chocolate bars.
+  
+3. Artisanal Truffles, Handmade Chocolate Nuggets and Chocolate Bars constrains binding.
+
+## Shadow price and Range of feasibility:
+
+-Cacao Butter : Shadow Price = $2 , Range of feasibility = 47.5 to 51.6
+
+-Honey : Shadow Price = $30 , Range of feasibility = 30 to 52
+
+-Dairy Cream : Shadow Price = $6 , Range of feasibility = 29.1 to 50
+ 
+## Range of optimality: 
+
+-Artisanal Truffles : $20 to $38
+     
+-Handcrafted Chocolate Nuggets: $22.50 to $26.66
+     
+-Premium Gourmet chocolate bars: $18.75 to $35
+
+***
+
+#Loading the library
+
+```{r}
+library(lpSolveAPI)
+```
+***
+
+#Problem Statement:
+
+A renowned chocolatier, Francesco Schröeder, makes three kinds of chocolate confectionery: artisanal truffles, handcrafted chocolate nuggets, and premium gourmet chocolate bars. He uses the highest quality of cacao butter, dairy cream, and honey as the main ingredients. Francesco makes his chocolates each morning, and they are usually sold out by the early afternoon. For a pound of artisanal truffles, Francesco uses 1 cup of cacao butter, 1 cup of honey, and 1/2 cup of cream. The handcrafted nuggets are milk chocolate and take 1/2 cup of cacao, 2/3 cup of honey, and 2/3 cup of cream for each pound. Each pound of the chocolate bars uses 1 cup of cacao butter, 1/2 cup of honey, and 1/2 cup of cream. One pound of truffles, nuggets, and chocolate bars can be purchased for $35, $25, and $20, respectively. A local store places a daily order of 10 pounds of chocolate nuggets, which means that Francesco needs to make at least 10 pounds of the chocolate nuggets each day. Before sunrise each day, Francesco receives a delivery of 50 cups of cacao butter, 50 cups of honey, and 30 cups of dairy cream.
+
+*1.Formulate and solve the LP model that maximizes revenue given the constraints. How much of each chocolate product         should Francesco make each morning? What is the maximum daily revenue that he can make?      
+
+*2.Report the shadow price and the range of feasibility of each binding constraint.
+
+*3.If the local store increases the daily order to 25 pounds of chocolate nuggets, how much of each product should           Francesco make?
+
+***
+
+*1.Formulate and solve the LP model that maximizes revenue given the constraints. How much of each chocolate product         should Francesco make each morning? What is the maximum daily revenue that he can make?
+
+In an LP (Linear Programming) model, we need to pinpoint the following components: the objective, the variables that represent the choices we can make, and the limitations or conditions that must be adhered to.
+
+#Decision Variables: 
+These variables denote the quantities of products we must manufacture to attain our desired objective.Let us declare variables that represents our problem.
+
+*"AT" reflects Quantity of Artisanal Truffles produced.
+
+*"CN" reflects Quantity of Handcrafted Chocolate Nuggets produced.
+
+*"CB" reflects Quantity of Premium Gourmet Chocolate Bars produced.
+
+#Objective : 
+In the given statement our objective is to Maximizing the profit.Representing it by the letter "Z".
+
+*Maximizing Profit(Z) : 35AT + 25CN + 20CB*
+
+#Constraints:
+It demonstrates the sources and constraints that we face in completing the tasks.The most important step is to identify everything.
+
+-quantity constraint(Cacao Butter,Honey,Cream)
+
+-production constraint
+
+-Non-negativity constraint
+
+In the given problem we have 5 constraints.
+#The first three constraints represents the quantity constraints
+
+1.*Cacao Butter            : AT+(1/2)CN+CB <= 50*
+
+2.*Honey                   : AT+(2/3)CN+(1/2)CB <= 50*
+
+3.*Cream                   : AT(1/2)+(2/3)CN+(1/2)CB <= 30*
+
+4.*Nuggets production      : N >=10* (production constraint for nuggets)
+
+5.*Non-negativity constraint: AT,CN,CB >=0*
+(The above line shows that the quantity should be greater than Zero)
+  
+ *** 
+
+#Here, we create the basic lp model with 0 constraints and decision variables from our statement.
+#Setting the objective functions
+#The programming set default is minimization. we should change it to max.
+
+```{r echo=FALSE, results= 'hide'}
+Choco_delights <- make.lp(0,3)
+
+set.objfn(Choco_delights,c(35,25,20))
+lp.control(Choco_delights,sense = 'max')
+
+#Adding the constraints to the model that we identified
+add.constraint(Choco_delights,c(1,1/2,1),"<=",50)
+add.constraint(Choco_delights,c(1,2/3,1/2),"<=",50)
+add.constraint(Choco_delights,c(1/2,2/3,1/2),"<=",30)
+
+add.constraint(Choco_delights,c(0,1,0),">=",10)
+
+#Set bounds for variables.By this we can get the values upto certain limit.
+#Because we can't take a negative quantity, we kept our lower bound at (0,0).
+#Non negativity constraint
+
+set.bounds(Choco_delights, lower = c(0, 0,0), columns = c(1,2,3)) #Not really needed
+
+
+#Making the problem statement easily understandable by labeling the rows and columns
+
+ColNames = c("Truffles","Nuggets","Gourmet")
+RowNames = c("Cacao_Butter","Honey","Cream","Production_nuggets")
+dimnames(Choco_delights) <- list(RowNames,ColNames)
+```
+
+#Now printing the model.
+
+```{r}
+Choco_delights
+```
+
+***
+#The below function changes the model to Lp format so that it can be read by LP solver libraries in future.
+
+```{r}
+coc = write.lp(Choco_delights, filename = "Flakes.lp", type = "lp")
+
+```
+
+#Solve function shows whether our model is running successfully or not.If the output is '0',then the model working is fine.
+
+```{r}
+solve(Choco_delights)
+```
+#Objective Function: we get know the max_revenue that we can earn per day with the sources we have.
+#Variable Function: Here we will know the quantity of variable products that we have to produce to get the max_revenue
+
+```{r}
+Max_profit = get.objective(Choco_delights)
+cat("The maximum revenue obtained: $",Max_profit,"\n")
+
+Min_Prod = get.variables(Choco_delights)
+cat("Quantity produced(T,N,G): ",Min_Prod,"\n")
+```
+
+#The below code snippet is another method to access the model through lp format file.
+
+```{r}
+x = read.lp("Flakes.lp")
+x
+```
+#Solving LP model
+
+```{r}
+solve(x)
+get.objective(x)
+get.variables(x)
+get.constraints(x)
+```
+***
+
+*2.Report the shadow price and the range of feasibility of each binding constraint.
+
+#The below code we can get the shadow prices and the range of feasibility.
+
+#Shadow prices and the range of Feasibility
+
+***
+```{r}
+shadow_prices <- get.sensitivity.rhs(x)
+shadow_prices
+
+reduced_costs <- get.sensitivity.obj(x) 
+reduced_costs
+
+```
+
+*3.If the local store increases the daily order to 25 pounds of chocolate nuggets, how much 
+of each product should Francesco make?
+
+#We are updating the constraint to 25 to get the new production quantities.
+#add.constraint(Choco_delights,c(0,1,0),">=",25) 
+
+```{r echo=FALSE, results= 'hide'}
+Choco_delights <- make.lp(0,3)
+
+set.objfn(Choco_delights,c(35,25,20))
+lp.control(Choco_delights,sense = 'max')
+
+#Adding the constraints to the model that we identified
+add.constraint(Choco_delights,c(1,1/2,1),"<=",50)
+add.constraint(Choco_delights,c(1,2/3,1/2),"<=",50)
+add.constraint(Choco_delights,c(1/2,2/3,1/2),"<=",30)
+
+add.constraint(Choco_delights,c(0,1,0),">=",25)
+
+# Set bounds for variables.
+set.bounds(Choco_delights, lower = c(0, 0, 0), columns = c(1, 2, 3)) 
+
+# To identify the variables and constraints, we can set variable names and name the constraints
+RowNames <- c("CacaoButter", "Honey", "DiaryCream", "NUggetsOrder")
+
+ColNames <- c("AritisanTruffel", "ChocalateNuggets", "ChocalateBars")
+
+dimnames(Choco_delights) <- list(RowNames, ColNames)
+```
+
+```{r}
+#Now, printing out the model
+Choco_delights
+```
+
+
+```{r}
+#The model can also be saved to a file
+write.lp(Choco_delights, filename = "Flakes.lp", type = "lp")
+solve(Choco_delights)
+get.objective(Choco_delights)
+
+varV <- get.variables(Choco_delights)
+
+
+x <- read.lp("Flakes.lp") # create an lp object x
+x 
+
+```
+
+```{r}
+solve(Choco_delights)
+
+#get objective value
+get.objective(Choco_delights)
+
+#get values of decision variables
+get.variables(Choco_delights)
+
+#get constraint RHS values
+get.constraints(Choco_delights)
+```
