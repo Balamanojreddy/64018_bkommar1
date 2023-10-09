@@ -1,0 +1,81 @@
+---
+title: "Jetengine"
+author: "Balamanoj Reddy Kommareddy"
+date: "2023-10-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+***
+#Summary
+
+#1 .The demand for 4 months are 10, 15, 25 and 20, put that in the sheet of demand row.
+
+#2. The production capacity in these 4 months are 25, 35, 30, and 10 put these in total capacity.
+
+#3. The LP model is a linear program with 9 limits and 20 decision variables. The optimal total cost is the minimum amount of money that can be spent to meet the contractual obligations of Northern Airplane Company. Since one of the limits in month 1 is actually about 10 units, the minimum cumulative output in month 1 is only 10 units. To meet constraint number 2, 25 engines must be built by the end of month 2. To meet this constraint, a minimum of 50 engines must be built in month 3. To meet this limitation, a minimum of 70 engines need to be built in month 4
+
+#4. The sensitivity analysis for the objective function enables us to evaluate the effect of modifications to production and storage cost factors on the total cost. By altering the production cost coefficient and storage cost per month, we can identify how these modifications affect the minimum total cost and thus make informed decisions regarding cost control.
+
+#5. Provides an optimal production and storage schedule that reduces costs while adhering to contractual obligations. A sensitivity analysis shows how changes in key parameters impact the costs related to changing production levels. Understands the impact of changing production levels through shadow prices. Reducedcosts reveal additional information about how sensitive the objective function is to changing objective coefficients. Northern Airplane Company can make strategic decisions on engine production and storage based on this.
+
+#/* Objective function */ 
+#min : 1.080 x11 + 1.095 x12 + 1.110 x13 + 1.125 x14 + 50 x21 + 1.110 x22 + 1.125 x23 + 1.140 x24 + 50 x31 + 50 x32 + 1.100 x33 + 1.115 x34 + 50 x41 + 50 x42 + 50 x43 + 1.130 x44;
+
+/*constraints*/
+#1. x11 + x12 + x13 + x14 + x15 = 25;
+#2. x21 + x22 + x23 + x24 + x25 = 35;
+#3. x31 + x32 + x33 + x34 + x35 = 30;
+#4. x41 + x42 + x43 + x44 + x45 = 10;
+
+#1. x11 + x21 + x31 + x41 = 10;
+#2. x12 + x22 + x32 + x42 = 15;
+#3. x13 + x23 + x33 + x43 = 25;
+#4. x14 + x24 + x34 + x44 = 20;
+#5. x15 + x25 + x35 + x45 = 30;
+***
+#Problem Statement
+#The NORTHERN AIRPLANE COMPANY builds commercial airplanes for various airline companies around the world. The last stage in the production process is to produce the jet engines and then to install them (a very fast operation) in the completed airplane frame. The company has been working under some contracts to deliver a considerable number of airplanes in the near future, and the production of the jet engines for these planes must now be scheduled for the next four months. To meet the contracted dates for delivery, the company must supply engines for installation in the quantities indicated in the second column of Table 9.7. Thus, the cumulative number of engines produced by the end of months 1, 2, 3, and 4 must be at least 10, 25, 50, and 70, respectively. The facilities that will be available for producing the engines vary according to other production, maintenance, and renovation work scheduled during this period.The resulting monthly differences in the maximum number that can be produced and the cost (in millions of dollars) of producing each one are given in the third and fourth columns of Table 9.7 (that was shown in class).
+
+#Because of the variations in production costs, it may well be worthwhile to produce some of the engines a month or more before they are scheduled for installation, and this possibility is being considered. The drawback is that such engines must be stored until the scheduled installation (the airplane frames will not 1 be ready early) at a storage cost of $15,000 per month (including interest on expended capital) for each engine,1 as shown in the rightmost column of Table 9.7.
+
+#The production manager wants a schedule developed for the number of engines to be produced in each of the four months so that the total of the production and storage costs will be minimized.
+
+***
+# 1.Installing and loading the ISLR package
+#install.packages("lpsolveAPI")
+```{r}
+library(lpSolveAPI)
+```
+
+# 2.Reading the LP file
+```{r}
+Trans <- read.lp("Jetengine.lp")
+Trans
+```
+# Solving the LP problem. Remember that values of variables appear in the order as given in the formulation. As such, the last five values in the solution refer to the dummy installations
+```{r}
+solve(Trans)
+```
+#Getting the valueS of decision variables
+```{r}
+get.variables(Trans)
+```
+#Getting the Constraints RHS (Right-Hand Side) Values
+```{r}
+get.constraints(Trans)
+```
+#Retrieving the Objective Function (Reduced Cost)
+```{r}
+get.objective(Trans)
+```
+#Retrieving the sensitivity of the objective function
+```{r}
+get.sensitivity.obj(Trans)
+```
+#Retrieving the Sensitivity of the Right-Hand Side (RHS)
+```{r}
+get.sensitivity.rhs(Trans)
+```
