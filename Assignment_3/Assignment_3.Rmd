@@ -1,0 +1,87 @@
+---
+title: "DEA_Assignment"
+author: "Balamanoj Reddy Kommareddy"
+date: "2023-11-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+***
+# Summary:
+
+In summary, the energy efficiency of the data centers varies. To improve the energy consumption and performance of the data centers, it is important to focus on those data centers with lower energy efficiency ratings, especially those in the lowest quartile. By implementing innovative and open energy efficiency regulations and corrective actions in these data centers, significant cost savings and increased sustainability can be achieved. The focus should be on maintaining the current level of energy efficiency for data centers with higher efficiency ratings.
+
+The efficiency ranges from -0.4754 to -1.0000. The mean value is -0.8535. This means that the procedure is generally efficient. However, there is a wide range of efficiency values. This means that there is still room for improvement in some aspects. The median value is 0.9957, which is slightly higher than the mean, indicating that half of the values are higher than the mean.
+
+***
+# Analyzing the outcomes:-
+
+1.Efficiency Scores: 
+
+A score of 0 denotes complete inefficiency, whereas a score of 1 represents optimal efficiency.
+
+- Maximum Efficiency Data Centers: - Data Centers 1, 2, 5, 7, 10, 13, and 15 have efficiency ratings of 1, indicating exceptional performance. They are effectively making the most use of their energy and resources.
+
+2.High Performance Data Centers:
+
+- The efficiency scores of Data Centers 3, 14, and 16 are nearly equal to one, or approximately 0.99, suggesting that they are operating efficiently as well.There is, however, still potential for development.
+
+3.Data Centers with Room for Growth:
+
+- Lower efficiency scores for Data Centers 8, 9, and 11 point to operational inefficiencies. Enhancing processes and putting energy-saving measures into place can be helpful to them.
+
+4.Significantly Inefficient Data Centers:
+
+- Data Centers 4, 6, 12, 17, and 18 have the lowest efficiency scores (about 0.47), indicating significant inefficiencies. Energy-saving technology and operational improvements should be given top priority if they want to reduce energy use and boost performance.
+
+5.Peers: 
+
+-This describes the relationship between Decision Making Units (DMUs) that have comparable output and input characteristics and are used to compare efficiency. These are used to assess the performance of a given DMU and provide recommendations for improving its efficiency.
+
+-As an example, the 11th DMU has a relationship with the 2,13,15 DMUs.
+
+6.Lambda:
+
+-The "lambda" function in DEA is used to determine the weights or multipliers that are applied to each of a DMU's inputs and outputs when computing its efficiency score. These weights describe the relative importance or contribution of each input and output to the overall efficiency of the DMU. 
+
+-For example, if the lamda value is 1, that attribute has a greater impact in establishing the Decision Making Units efficiency score, and if the value is less than 1, that attribute contributes to the score but is not the only component.
+
+***
+
+## Conclusion:
+
+- The majority of the figures are near to one, indicating that the system is efficient. The minimum and the recurrence of values below the median and mean, on the other hand, imply that there are a few values that are significantly lower than 1. Use DEA to identify inefficiencies and conduct corrective actions. Prioritize energy-saving strategies to make your data centers more sustainable and cost-effective.
+
+- One method for increasing process efficiency is to identify and eliminate bottlenecks. Another option for increasing efficiency is to invest in new technology or equipment.
+
+***
+#Installing and loading the "Benchmarking" Library to perform the DEA Analysis.
+```{r}
+library("Benchmarking")
+```
+
+#Loading the sample dataset "energy".
+```{r}
+Energy <- read.csv("energy.csv")
+Energy
+```
+
+#Feeding the inputs and outputs for the DEA analysis.
+```{r}
+inputs <- Energy[,c("D.C..Size","Shut.Downs")]
+outputs <- Energy[,c("Computing.Time..h.","MWh.Consumed","Queue.Time..ms.")]
+
+
+#make a model and feed input and output to the model
+Consumpt <- dea(inputs, outputs, RTS =   "crs")
+efficiency <- eff(Consumpt)
+
+#the efficiency scores calculated from the DEA analysis.
+efficiency
+summary(efficiency)
+
+```
+
