@@ -1,0 +1,117 @@
+---
+title: "bkommar_4_QMM"
+author: "Balamanoj Reddy Kommareddy"
+date: "2023-11-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+***
+
+## Problem - GOAL PROGRAMMING
+The Research and Development Division of the Emax Corporation has developed three new products. A decision now needs to be made on which mix of these products should be produced. Management wants primary consideration given to three factors: total profit, stability in the workforce, and achieving an increase in the company’s earnings next year from the $75 million achieved this year. In particular, using the units given in the following table, they want to
+
+Maximize Z = P - 6C - 3D, where
+
+P = total (discounted) profit over the life of the new products,
+C = change (in either direction) in the current level of employment,
+D = decrease (if any) in next year’s earnings from the current year’s level
+
+The amount of any increase in earnings does not enter into Z, because management is concerned primarily with just achieving some increase to keep the stockholders happy. (It has mixed feelings about a large increase that then would be difficult to surpass in subsequent years.) 
+
+#summary
+
+- In this case, I substituted y1p, y1n, y2p, and y2n for y1+, y1-, y2+, and y2-. I took x1, x2, and x3 for the products mentioned. All of the terms defined below have been defined.
+ 
+  - y1p: Positive deviation that is abundance of Employees.
+ 
+  - y1n: Negative deviation that is Lack of Employees.
+ 
+  - y2p: Positive deviation of Earnings.
+ 
+  - y2n: Negative deviation of Earnings.
+ 
+    x1, x2, x3 are the production rates of products Product1, Product2, Product3.
+ 
+- The primary goal i.e; maximize equation becomes:
+
+     Maximize Z = P - 6C - 3D, where
+    
+   - P = total (discounted) profit over the life of the new products.
+    
+     P = 20x1 + 15x2 + 25x3
+ 
+   - C = change (in either direction) in the current level of employment.
+     
+     C = 6y1p - 6y1n
+    
+   - D = decrease (if any) in next year’s earnings from the current year’s level.
+   
+     D = 3y2n
+     
+- Therefore, the final problem statement is:
+
+   - Maximize Z = 20x1 + 15x2 + 25x3 - 6y1p - 6y1n - 3y2n.
+   
+- Now let us consider the constraints of the problem. 
+  
+  ST:
+  
+  - Employee factor Constraint: 6x1 + 4x2 + 5x3 - y1p + y1n = 50;
+  - Earning factor Constraint : 8x1 + 7x2 + 5x3 - y2p + y2n >= 75;
+  - Decision variables Constraint: x1, x2, x3, y1p, y1n, y2p, y2n >= 0;(Non-Negativity)
+   
+  
+# Observations:
+
+- The combination units that the company(RDD) must use to maximize the goal function are x1, x2, and x3.Because the ultimate solution is "0", x1 and x2 cannot be produced as planned, i.e. 20 units of x1 and 15 units of x2. However, there is a change to x3 in that Product 3 is the only product that the company can produce, i.e. 15 units of x3 to maximize profit.
+
+- The goal is to stabilize the employment level by limiting the maximum number of workers to 50 hundred, but in this case, the business exceeded the employment levels by 25 hundred employees (y1p), for which they would be required to pay a penalty for the excess/rise in employee count.
+
+- The purpose of y2p and y2n was to capture the increase or decrease in future year profits from the current level, which in this case is "0," indicating that there is no gain or decrease in future year earnings compared to the current year. As a result, profits for the following year remain unchanged.
+
+- The objective function value, which in our case is 225 million dollars, represents the profit that the corporation seeks to maximize.
+
+***
+
+# Here we will require the "lpSolveAPI" library
+```{r}
+library(lpSolveAPI)
+```
+
+#loading the .lp file
+```{r}
+RDD <- read.lp("Goal.lp")
+RDD
+```
+
+#The matrix employ_max contains information about a decision-making involving profit, employment level, and earnings next year, with certain constraints and objectives.
+```{r}
+employ_max <- matrix(c("Profit", "Employment Level", "Earnings Next Year",
+                       20,6,8,
+                       15,4,7,
+                       25,5,5,
+                       "Maximize","=50",">=75",
+                       "Millions of Dollars", "Hundreds of Employees", "Millions of Dollars"), ncol=6, byrow = F)
+employ_max
+```
+
+```{r}
+colnames(employ_max) <- c("Factor","x1", "x2", "x3", "Goal", "Units")
+
+as.table(employ_max)
+```
+
+#Formulating and solve the linear programming model.
+```{r}
+solve(RDD)
+```
+```{r}
+get.objective(RDD)
+get.variables(RDD)
+```
+
+***
